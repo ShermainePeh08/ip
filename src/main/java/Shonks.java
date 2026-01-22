@@ -1,7 +1,20 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-
+/**
+ * Entry point of the Shonks chatbot.
+ * <p>
+ * Shonks reads user commands from standard input and manages a list of tasks.
+ * It supports adding, listing, marking, unmarking, deleting tasks,
+ * and handles invalid user inputs gracefully.
+ */
 public class Shonks {
+
+    /**
+     * Runs the Shonks chatbot.
+     * <p>
+     * Continuously reads user input, processes commands,
+     * and prints responses until the user issues the {bye} command.
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Task> tasks = new ArrayList<>();
@@ -49,6 +62,21 @@ public class Shonks {
                     System.out.println(t.formatStatusLine());
                     continue;
                 }
+
+                if (input.startsWith("delete")) {
+                    if (input.equals("delete")) {
+                        throw new ShonksException("Please specify which task number to delete.");
+                    }
+
+                    int index = Integer.parseInt(input.substring(7).trim());
+                    Task removed = tasks.remove(index - 1);
+
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println("  " + removed.formatStatusLine());
+                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                    continue;
+                }
+
 
                 if (input.startsWith("todo")) {
                     if (input.equals("todo")) {
