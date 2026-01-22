@@ -1,6 +1,6 @@
 public class Task {
-    private final String description;
-    private boolean isDone;
+    protected final String description;
+    protected boolean isDone;
 
     public Task(String description) {
         this.description = description;
@@ -15,13 +15,27 @@ public class Task {
         this.isDone = false;
     }
 
+    protected String getStatusIcon() {
+        return isDone ? "X" : " ";
+    }
+
+    protected String getTypeIcon() {
+        // override by subclasses
+        return " "; 
+    }
+
+    protected String getDetails() {
+        // override by subclasses
+        return ""; 
+    }
+
     public String formatForList(int index) {
-        String status = isDone ? "X" : " ";
-        return index + ".[" + status + "] " + description;
+        return index + ".[" + getTypeIcon() + "][" + getStatusIcon() + "] "
+                + description + getDetails();
     }
 
     public String formatStatusLine() {
-        String status = isDone ? "X" : " ";
-        return "[" + status + "] " + description;
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] "
+                + description + getDetails();
     }
 }
