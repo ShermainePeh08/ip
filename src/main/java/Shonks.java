@@ -1,23 +1,25 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+
 /**
  * Entry point of the Shonks chatbot.
  * <p>
  * Shonks reads user commands from standard input and manages a list of tasks.
- * It supports adding, listing, marking, unmarking, deleting tasks,
- * and handles invalid user inputs gracefully.
  */
 public class Shonks {
 
-    /**
-     * Runs the Shonks chatbot.
-     * <p>
-     * Continuously reads user input, processes commands,
-     * and prints responses until the user issues the {bye} command.
-     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+
+        Storage storage = new Storage("./data/shonks.txt");
+        ArrayList<Task> tasks;
+
+        try {
+            tasks = storage.load();
+        } catch (ShonksException e) {
+            tasks = new ArrayList<>();
+            System.out.println("Oops! " + e.getMessage());
+        }
 
         System.out.println("Hello! I'm Shonks");
         System.out.println("What can I do for you?");
@@ -46,6 +48,8 @@ public class Shonks {
                     int index = Integer.parseInt(input.substring(5).trim());
                     Task t = tasks.get(index - 1);
                     t.markDone();
+                    storage.save(tasks);
+
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println(t.formatStatusLine());
                     continue;
@@ -58,6 +62,8 @@ public class Shonks {
                     int index = Integer.parseInt(input.substring(7).trim());
                     Task t = tasks.get(index - 1);
                     t.unmarkDone();
+                    storage.save(tasks);
+
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.println(t.formatStatusLine());
                     continue;
@@ -70,6 +76,7 @@ public class Shonks {
 
                     int index = Integer.parseInt(input.substring(7).trim());
                     Task removed = tasks.remove(index - 1);
+                    storage.save(tasks);
 
                     System.out.println("Noted. I've removed this task:");
                     System.out.println("  " + removed.formatStatusLine());
@@ -77,13 +84,14 @@ public class Shonks {
                     continue;
                 }
 
-
                 if (input.startsWith("todo")) {
                     if (input.equals("todo")) {
                         throw new ShonksException("The description of a todo cannot be empty.");
                     }
                     Task t = new Todo(input.substring(5).trim());
                     tasks.add(t);
+                    storage.save(tasks);
+
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + t.formatStatusLine());
                     System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -101,6 +109,8 @@ public class Shonks {
                     }
                     Task t = new Deadline(parts[0], parts[1]);
                     tasks.add(t);
+                    storage.save(tasks);
+
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + t.formatStatusLine());
                     System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -118,6 +128,8 @@ public class Shonks {
                     }
                     Task t = new Event(parts[0], parts[1], parts[2]);
                     tasks.add(t);
+                    storage.save(tasks);
+
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + t.formatStatusLine());
                     System.out.println("Now you have " + tasks.size() + " tasks in the list.");

@@ -4,12 +4,6 @@
 public class Deadline extends Task {
     private final String by;
 
-    /**
-     * Creates a deadline task with a description and deadline time.
-     *
-     * @param description Description of the task.
-     * @param by Deadline time.
-     */
     public Deadline(String description, String by) {
         super(description);
         this.by = by;
@@ -23,5 +17,15 @@ public class Deadline extends Task {
     @Override
     protected String getDetails() {
         return " (by: " + by + ")";
+    }
+
+    @Override
+    protected String getStorageType() {
+        return "D";
+    }
+
+    @Override
+    protected String getStorageExtra() {
+        return " | " + by;
     }
 }
