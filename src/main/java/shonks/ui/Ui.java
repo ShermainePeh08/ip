@@ -1,4 +1,7 @@
+package shonks.ui;
 import java.util.Scanner;
+
+import shonks.task.Task;
 
 public class Ui {
     private final Scanner scanner = new Scanner(System.in);

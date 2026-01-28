@@ -1,3 +1,4 @@
+package shonks;
 /**
  * Represents an exception specific to the Shonks chatbot.
  * <p>

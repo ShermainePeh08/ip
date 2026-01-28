@@ -1,5 +1,8 @@
+package shonks.task;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import shonks.ShonksException;
 
 /**
  * Represents a generic task with a description and completion status.
