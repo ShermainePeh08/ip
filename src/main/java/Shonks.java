@@ -1,169 +1,90 @@
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-/**
- * Entry point of the Shonks chatbot.
- * <p>
- * Shonks reads user commands from standard input and manages a list of tasks.
- */
 public class Shonks {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
+        Ui ui = new Ui();
         Storage storage = new Storage("./data/shonks.txt");
-        ArrayList<Task> tasks;
 
+        TaskList taskList;
         try {
-            tasks = storage.load();
+            ArrayList<Task> loaded = storage.load();
+            taskList = new TaskList(loaded);
         } catch (ShonksException e) {
-            tasks = new ArrayList<>();
-            System.out.println("Oops! " + e.getMessage());
+            taskList = new TaskList();
+            ui.showError(e.getMessage());
         }
 
-        System.out.println("Hello! I'm Shonks");
-        System.out.println("What can I do for you?");
+        ui.showWelcome();
 
         while (true) {
             try {
-                String input = scanner.nextLine().trim();
+                String input = ui.readCommand();
+                Command command = Parser.parse(input);
 
-                if (input.equals("bye")) {
-                    System.out.println("Bye. Hope to see you again soon!");
+                if (command.type == Command.Type.EXIT) {
+                    ui.showBye();
                     break;
                 }
 
-                if (input.equals("list")) {
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println(tasks.get(i).formatForList(i + 1));
+                if (command.type == Command.Type.LIST) {
+                    ui.showListHeader();
+                    for (int i = 0; i < taskList.size(); i++) {
+                        ui.showLine(taskList.get(i).formatForList(i + 1));
                     }
                     continue;
                 }
 
-                if (input.startsWith("mark")) {
-                    if (input.equals("mark")) {
-                        throw new ShonksException("Please specify which task number to mark.");
-                    }
-                    int index = Integer.parseInt(input.substring(5).trim());
-                    Task t = tasks.get(index - 1);
+                if (command.type == Command.Type.MARK) {
+                    Task t = taskList.get(command.index - 1);
                     t.markDone();
-                    storage.save(tasks);
-
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println(t.formatStatusLine());
+                    storage.save(taskList.getInternalList());
+                    ui.showMarked(t);
                     continue;
                 }
 
-                if (input.startsWith("unmark")) {
-                    if (input.equals("unmark")) {
-                        throw new ShonksException("Please specify which task number to unmark.");
-                    }
-                    int index = Integer.parseInt(input.substring(7).trim());
-                    Task t = tasks.get(index - 1);
+                if (command.type == Command.Type.UNMARK) {
+                    Task t = taskList.get(command.index - 1);
                     t.unmarkDone();
-                    storage.save(tasks);
-
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println(t.formatStatusLine());
+                    storage.save(taskList.getInternalList());
+                    ui.showUnmarked(t);
                     continue;
                 }
 
-                if (input.startsWith("delete")) {
-                    if (input.equals("delete")) {
-                        throw new ShonksException("Please specify which task number to delete.");
-                    }
-
-                    int index = Integer.parseInt(input.substring(7).trim());
-                    Task removed = tasks.remove(index - 1);
-                    storage.save(tasks);
-
-                    System.out.println("Noted. I've removed this task:");
-                    System.out.println("  " + removed.formatStatusLine());
-                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                if (command.type == Command.Type.DELETE) {
+                    Task removed = taskList.remove(command.index - 1);
+                    storage.save(taskList.getInternalList());
+                    ui.showDeleted(removed, taskList.size());
                     continue;
                 }
 
-                if (input.startsWith("todo")) {
-                    if (input.equals("todo")) {
-                        throw new ShonksException("The description of a todo cannot be empty.");
-                    }
-                    Task t = new Todo(input.substring(5).trim());
-                    tasks.add(t);
-                    storage.save(tasks);
-
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + t.formatStatusLine());
-                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                if (command.type == Command.Type.TODO) {
+                    Task t = new Todo(command.description);
+                    taskList.add(t);
+                    storage.save(taskList.getInternalList());
+                    ui.showAdded(t, taskList.size());
                     continue;
                 }
 
-                if (input.startsWith("deadline")) {
-                    if (!input.contains("/by")) {
-                        throw new ShonksException("Deadline must have /by <date>.");
-                    }
-                    String rest = input.substring(9).trim();
-                    String[] parts = rest.split(" /by ");
-                    if (parts[0].isEmpty()) {
-                        throw new ShonksException("The description of a deadline cannot be empty.");
-                    }
-
-                    LocalDate by;
-                    try {
-                        by = LocalDate.parse(parts[1].trim()); // yyyy-MM-dd
-                    } catch (DateTimeParseException e) {
-                        throw new ShonksException("Please use date format yyyy-MM-dd (e.g., 2019-10-15).");
-                    }
-
-                    Task t = new Deadline(parts[0], by);
-                    tasks.add(t);
-                    storage.save(tasks);
-
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + t.formatStatusLine());
-                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                if (command.type == Command.Type.DEADLINE) {
+                    Task t = new Deadline(command.description, command.by);
+                    taskList.add(t);
+                    storage.save(taskList.getInternalList());
+                    ui.showAdded(t, taskList.size());
                     continue;
                 }
 
-                if (input.startsWith("event")) {
-                    if (!input.contains("/from") || !input.contains("/to")) {
-                        throw new ShonksException("Event must have /from <start> /to <end>.");
-                    }
-                    String rest = input.substring(6).trim();
-                    String[] parts = rest.split(" /from | /to ");
-                    if (parts[0].isEmpty()) {
-                        throw new ShonksException("The description of an event cannot be empty.");
-                    }
-
-                    LocalDateTime from;
-                    LocalDateTime to;
-                    try {
-                        from = LocalDateTime.parse(parts[1].trim()); // e.g. 2019-10-15T14:00
-                        to = LocalDateTime.parse(parts[2].trim());   // e.g. 2019-10-15T16:00
-                    } catch (DateTimeParseException e) {
-                        throw new ShonksException("Please use datetime format yyyy-MM-ddTHH:mm "
-                                + "(e.g., 2019-10-15T14:00).");
-                    }
-
-                    Task t = new Event(parts[0], from, to);
-                    tasks.add(t);
-                    storage.save(tasks);
-
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + t.formatStatusLine());
-                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                    continue;
+                if (command.type == Command.Type.EVENT) {
+                    Task t = new Event(command.description, command.from, command.to);
+                    taskList.add(t);
+                    storage.save(taskList.getInternalList());
+                    ui.showAdded(t, taskList.size());
                 }
-
-                throw new ShonksException("I don't understand that command.");
 
             } catch (ShonksException e) {
-                System.out.println("Oops! " + e.getMessage());
+                ui.showError(e.getMessage());
             } catch (Exception e) {
-                System.out.println("Oops! Something went wrong.");
+                ui.showGenericError();
             }
         }
     }

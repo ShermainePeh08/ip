@@ -1,2 +1,4 @@
+D | 1 | return book | 2019-10-15
+T | 0 | read book
 D | 0 | return book | 2019-10-15
 E | 0 | meeting | 2019-10-15T14:00 | 2019-10-15T16:00
