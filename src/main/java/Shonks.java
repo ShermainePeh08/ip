@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -100,14 +103,22 @@ public class Shonks {
 
                 if (input.startsWith("deadline")) {
                     if (!input.contains("/by")) {
-                        throw new ShonksException("Deadline must have /by <time>.");
+                        throw new ShonksException("Deadline must have /by <date>.");
                     }
                     String rest = input.substring(9).trim();
                     String[] parts = rest.split(" /by ");
                     if (parts[0].isEmpty()) {
                         throw new ShonksException("The description of a deadline cannot be empty.");
                     }
-                    Task t = new Deadline(parts[0], parts[1]);
+
+                    LocalDate by;
+                    try {
+                        by = LocalDate.parse(parts[1].trim()); // yyyy-MM-dd
+                    } catch (DateTimeParseException e) {
+                        throw new ShonksException("Please use date format yyyy-MM-dd (e.g., 2019-10-15).");
+                    }
+
+                    Task t = new Deadline(parts[0], by);
                     tasks.add(t);
                     storage.save(tasks);
 
@@ -126,7 +137,18 @@ public class Shonks {
                     if (parts[0].isEmpty()) {
                         throw new ShonksException("The description of an event cannot be empty.");
                     }
-                    Task t = new Event(parts[0], parts[1], parts[2]);
+
+                    LocalDateTime from;
+                    LocalDateTime to;
+                    try {
+                        from = LocalDateTime.parse(parts[1].trim()); // e.g. 2019-10-15T14:00
+                        to = LocalDateTime.parse(parts[2].trim());   // e.g. 2019-10-15T16:00
+                    } catch (DateTimeParseException e) {
+                        throw new ShonksException("Please use datetime format yyyy-MM-ddTHH:mm "
+                                + "(e.g., 2019-10-15T14:00).");
+                    }
+
+                    Task t = new Event(parts[0], from, to);
                     tasks.add(t);
                     storage.save(tasks);
 

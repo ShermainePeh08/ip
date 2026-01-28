@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * Represents a generic task with a description and completion status.
  * <p>
@@ -43,7 +46,7 @@ public class Task {
     }
 
     // =======================
-    // Level-7 Save/Load parts
+    // Level-7/8 Save/Load parts
     // =======================
 
     /**
@@ -92,12 +95,15 @@ public class Task {
             if (parts.length < 4) {
                 throw new ShonksException("Corrupted deadline line: " + line);
             }
-            t = new Deadline(desc, parts[3]);
+            LocalDate by = LocalDate.parse(parts[3]); // yyyy-MM-dd
+            t = new Deadline(desc, by);
         } else if (type.equals("E")) {
             if (parts.length < 5) {
                 throw new ShonksException("Corrupted event line: " + line);
             }
-            t = new Event(desc, parts[3], parts[4]);
+            LocalDateTime from = LocalDateTime.parse(parts[3]); // ISO-8601
+            LocalDateTime to = LocalDateTime.parse(parts[4]);   // ISO-8601
+            t = new Event(desc, from, to);
         } else {
             throw new ShonksException("Unknown task type in save file: " + type);
         }
