@@ -1,4 +1,15 @@
+package shonks;
 import java.util.ArrayList;
+
+import shonks.command.Command;
+import shonks.parser.Parser;
+import shonks.storage.Storage;
+import shonks.task.Deadline;
+import shonks.task.Event;
+import shonks.task.Task;
+import shonks.task.TaskList;
+import shonks.task.Todo;
+import shonks.ui.Ui;
 
 public class Shonks {
 
