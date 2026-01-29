@@ -6,6 +6,9 @@ import java.time.format.DateTimeParseException;
 import shonks.ShonksException;
 import shonks.command.Command;
 
+/**
+ * Parses raw user input into structured commands.
+ */
 public class Parser {
 
     public static Command parse(String input) throws ShonksException {

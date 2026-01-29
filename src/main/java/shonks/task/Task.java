@@ -38,11 +38,22 @@ public class Task {
         return "";
     }
 
+    /**
+    * Returns the formatted representation of this task for list display.
+    *
+    * @param index The 1-based index shown to the user.
+    * @return A user-facing string representing the task.
+    */
     public String formatForList(int index) {
         return index + ".[" + getTypeIcon() + "][" + getStatusIcon() + "] "
                 + description + getDetails();
     }
 
+    /**
+    * Returns the formatted representation of this task without list index.
+    *
+    * @return A user-facing string representing the task.
+    */
     public String formatStatusLine() {
         return "[" + getTypeIcon() + "][" + getStatusIcon() + "] "
                 + description + getDetails();

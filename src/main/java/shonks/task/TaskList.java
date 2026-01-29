@@ -1,6 +1,10 @@
 package shonks.task;
 import java.util.ArrayList;
 
+/**
+ * Wraps the task collection and provides operations to add, delete,
+ * and access tasks in a single place.
+ */
 public class TaskList {
     private final ArrayList<Task> tasks;
 
