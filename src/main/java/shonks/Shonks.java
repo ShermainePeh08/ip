@@ -130,6 +130,24 @@ public class Shonks {
                     continue;
                 }
 
+                                if (command.type == Command.Type.FIND) {
+                    ui.showFindHeader();
+
+                    int shown = 0;
+                    for (int i = 0; i < taskList.size(); i++) {
+                        Task task = taskList.get(i);
+                        if (task.contains(command.keyword)) {
+                            shown++;
+                            ui.showLine(task.formatForList(shown));
+                        }
+                    }
+
+                    if (shown == 0) {
+                        ui.showNoFindMatches();
+                    }
+                    continue;
+                }
+
                 throw new ShonksException("I don't understand that command.");
 
             } catch (ShonksException e) {
