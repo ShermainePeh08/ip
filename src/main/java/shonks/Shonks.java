@@ -13,6 +13,22 @@ import shonks.ui.Ui;
 
 public class Shonks {
 
+    private static Task getTaskOrThrow(TaskList taskList, int oneBasedIndex) throws ShonksException {
+        int i = oneBasedIndex - 1;
+        if (i < 0 || i >= taskList.size()) {
+            throw new ShonksException("That task number does not exist.");
+        }
+        return taskList.get(i);
+    }
+
+    private static Task removeTaskOrThrow(TaskList taskList, int oneBasedIndex) throws ShonksException {
+        int i = oneBasedIndex - 1;
+        if (i < 0 || i >= taskList.size()) {
+            throw new ShonksException("That task number does not exist.");
+        }
+        return taskList.remove(i);
+    }
+
     public static void main(String[] args) {
         Ui ui = new Ui();
         Storage storage = new Storage("./data/shonks.txt");
@@ -47,55 +63,74 @@ public class Shonks {
                 }
 
                 if (command.type == Command.Type.MARK) {
-                    Task t = taskList.get(command.index - 1);
-                    t.markDone();
+                    Task task = getTaskOrThrow(taskList, command.index);
+                    task.markDone();
                     storage.save(taskList.getInternalList());
-                    ui.showMarked(t);
+                    ui.showMarked(task);
                     continue;
                 }
 
                 if (command.type == Command.Type.UNMARK) {
-                    Task t = taskList.get(command.index - 1);
-                    t.unmarkDone();
+                    Task task = getTaskOrThrow(taskList, command.index);
+                    task.unmarkDone();
                     storage.save(taskList.getInternalList());
-                    ui.showUnmarked(t);
+                    ui.showUnmarked(task);
                     continue;
                 }
 
                 if (command.type == Command.Type.DELETE) {
-                    Task removed = taskList.remove(command.index - 1);
+                    Task removed = removeTaskOrThrow(taskList, command.index);
                     storage.save(taskList.getInternalList());
                     ui.showDeleted(removed, taskList.size());
                     continue;
                 }
 
                 if (command.type == Command.Type.TODO) {
-                    Task t = new Todo(command.description);
-                    taskList.add(t);
+                    Task task = new Todo(command.description);
+                    taskList.add(task);
                     storage.save(taskList.getInternalList());
-                    ui.showAdded(t, taskList.size());
+                    ui.showAdded(task, taskList.size());
                     continue;
                 }
 
                 if (command.type == Command.Type.DEADLINE) {
-                    Task t = new Deadline(command.description, command.by);
-                    taskList.add(t);
+                    Task task = new Deadline(command.description, command.by);
+                    taskList.add(task);
                     storage.save(taskList.getInternalList());
-                    ui.showAdded(t, taskList.size());
+                    ui.showAdded(task, taskList.size());
                     continue;
                 }
 
                 if (command.type == Command.Type.EVENT) {
-                    Task t = new Event(command.description, command.from, command.to);
-                    taskList.add(t);
+                    Task task = new Event(command.description, command.from, command.to);
+                    taskList.add(task);
                     storage.save(taskList.getInternalList());
-                    ui.showAdded(t, taskList.size());
+                    ui.showAdded(task, taskList.size());
+                    continue;
                 }
+
+                if (command.type == Command.Type.FIND) {
+                    ui.showFindHeader();
+
+                    int shown = 0;
+                    for (int i = 0; i < taskList.size(); i++) {
+                        Task task = taskList.get(i);
+                        if (task.contains(command.keyword)) {
+                            shown++;
+                            ui.showLine(task.formatForList(shown));
+                        }
+                    }
+
+                    if (shown == 0) {
+                        ui.showNoFindMatches();
+                    }
+                    continue;
+                }
+
+                throw new ShonksException("I don't understand that command.");
 
             } catch (ShonksException e) {
                 ui.showError(e.getMessage());
-            } catch (Exception e) {
-                ui.showGenericError();
             }
         }
     }

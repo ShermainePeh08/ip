@@ -48,9 +48,15 @@ public class Task {
                 + description + getDetails();
     }
 
-    // =======================
-    // Level-7/8 Save/Load parts
-    // =======================
+    /**
+     * Checks if this task's description contains the keyword (case-insensitive).
+     *
+     * @param keyword Keyword to search for.
+     * @return True if the description contains the keyword.
+     */
+    public boolean contains(String keyword) {
+        return description.toLowerCase().contains(keyword.toLowerCase());
+    }
 
     /**
      * Converts this task into a single-line storage format.
@@ -91,29 +97,29 @@ public class Task {
         boolean done = parts[1].equals("1");
         String desc = parts[2];
 
-        Task t;
+        Task task;
         if (type.equals("T")) {
-            t = new Todo(desc);
+            task = new Todo(desc);
         } else if (type.equals("D")) {
             if (parts.length < 4) {
                 throw new ShonksException("Corrupted deadline line: " + line);
             }
             LocalDate by = LocalDate.parse(parts[3]); // yyyy-MM-dd
-            t = new Deadline(desc, by);
+            task = new Deadline(desc, by);
         } else if (type.equals("E")) {
             if (parts.length < 5) {
                 throw new ShonksException("Corrupted event line: " + line);
             }
             LocalDateTime from = LocalDateTime.parse(parts[3]); // ISO-8601
             LocalDateTime to = LocalDateTime.parse(parts[4]);   // ISO-8601
-            t = new Event(desc, from, to);
+            task = new Event(desc, from, to);
         } else {
-            throw new ShonksException("Unknown task type in save file: " + type);
+            throw new ShonksException("Unknown Task taskype in save file: " + type);
         }
 
         if (done) {
-            t.markDone();
+            task.markDone();
         }
-        return t;
+        return task;
     }
 }

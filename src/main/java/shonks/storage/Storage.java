@@ -51,8 +51,8 @@ public class Storage {
         }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-            for (Task t : tasks) {
-                bw.write(t.toStorageString());
+            for (Task task : tasks) {
+                bw.write(task.toStorageString());
                 bw.newLine();
             }
         } catch (IOException e) {
