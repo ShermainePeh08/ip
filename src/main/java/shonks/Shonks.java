@@ -1,4 +1,5 @@
 package shonks;
+
 import java.util.ArrayList;
 
 import shonks.command.Command;
@@ -11,7 +12,42 @@ import shonks.task.TaskList;
 import shonks.task.Todo;
 import shonks.ui.Ui;
 
+/**
+ * Entry point of the Shonks chatbot.
+ */
 public class Shonks {
+
+    /**
+     * Returns the task at the given 1-based index, or throws a ShonksException if invalid.
+     *
+     * @param taskList The task list.
+     * @param oneBasedIndex 1-based task number.
+     * @return The task at that index.
+     * @throws ShonksException If the index is out of range.
+     */
+    private static Task getTaskOrThrow(TaskList taskList, int oneBasedIndex) throws ShonksException {
+        int i = oneBasedIndex - 1;
+        if (i < 0 || i >= taskList.size()) {
+            throw new ShonksException("That task number does not exist.");
+        }
+        return taskList.get(i);
+    }
+
+    /**
+     * Removes the task at the given 1-based index, or throws a ShonksException if invalid.
+     *
+     * @param taskList The task list.
+     * @param oneBasedIndex 1-based task number.
+     * @return The removed task.
+     * @throws ShonksException If the index is out of range.
+     */
+    private static Task removeTaskOrThrow(TaskList taskList, int oneBasedIndex) throws ShonksException {
+        int i = oneBasedIndex - 1;
+        if (i < 0 || i >= taskList.size()) {
+            throw new ShonksException("That task number does not exist.");
+        }
+        return taskList.remove(i);
+    }
 
     public static void main(String[] args) {
         Ui ui = new Ui();
@@ -47,55 +83,56 @@ public class Shonks {
                 }
 
                 if (command.type == Command.Type.MARK) {
-                    Task t = taskList.get(command.index - 1);
-                    t.markDone();
+                    Task task = getTaskOrThrow(taskList, command.index);
+                    task.markDone();
                     storage.save(taskList.getInternalList());
-                    ui.showMarked(t);
+                    ui.showMarked(task);
                     continue;
                 }
 
                 if (command.type == Command.Type.UNMARK) {
-                    Task t = taskList.get(command.index - 1);
-                    t.unmarkDone();
+                    Task task = getTaskOrThrow(taskList, command.index);
+                    task.unmarkDone();
                     storage.save(taskList.getInternalList());
-                    ui.showUnmarked(t);
+                    ui.showUnmarked(task);
                     continue;
                 }
 
                 if (command.type == Command.Type.DELETE) {
-                    Task removed = taskList.remove(command.index - 1);
+                    Task removed = removeTaskOrThrow(taskList, command.index);
                     storage.save(taskList.getInternalList());
                     ui.showDeleted(removed, taskList.size());
                     continue;
                 }
 
                 if (command.type == Command.Type.TODO) {
-                    Task t = new Todo(command.description);
-                    taskList.add(t);
+                    Task task = new Todo(command.description);
+                    taskList.add(task);
                     storage.save(taskList.getInternalList());
-                    ui.showAdded(t, taskList.size());
+                    ui.showAdded(task, taskList.size());
                     continue;
                 }
 
                 if (command.type == Command.Type.DEADLINE) {
-                    Task t = new Deadline(command.description, command.by);
-                    taskList.add(t);
+                    Task task = new Deadline(command.description, command.by);
+                    taskList.add(task);
                     storage.save(taskList.getInternalList());
-                    ui.showAdded(t, taskList.size());
+                    ui.showAdded(task, taskList.size());
                     continue;
                 }
 
                 if (command.type == Command.Type.EVENT) {
-                    Task t = new Event(command.description, command.from, command.to);
-                    taskList.add(t);
+                    Task task = new Event(command.description, command.from, command.to);
+                    taskList.add(task);
                     storage.save(taskList.getInternalList());
-                    ui.showAdded(t, taskList.size());
+                    ui.showAdded(task, taskList.size());
+                    continue;
                 }
+
+                throw new ShonksException("I don't understand that command.");
 
             } catch (ShonksException e) {
                 ui.showError(e.getMessage());
-            } catch (Exception e) {
-                ui.showGenericError();
             }
         }
     }
