@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import shonks.ShonksException;
 import shonks.task.Task;
 
+/**
+ * Handles loading tasks from disk and saving tasks back to disk.
+ */
 public class Storage {
     private final String filePath;
 

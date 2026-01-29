@@ -11,8 +11,17 @@ import shonks.task.TaskList;
 import shonks.task.Todo;
 import shonks.ui.Ui;
 
+/**
+ * Entry point of the Shonks chatbot application.
+ * Reads user commands, updates the task list, and prints responses.
+ */
 public class Shonks {
 
+    /**
+     * Runs the chatbot loop until the user exits.
+     *
+     * @param args Command-line arguments (unused).
+     */
     public static void main(String[] args) {
         Ui ui = new Ui();
         Storage storage = new Storage("./data/shonks.txt");

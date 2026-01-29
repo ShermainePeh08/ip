@@ -3,6 +3,9 @@ import java.util.Scanner;
 
 import shonks.task.Task;
 
+/**
+ * Handles all user-facing text output and input prompting.
+ */
 public class Ui {
     private final Scanner scanner = new Scanner(System.in);
 
