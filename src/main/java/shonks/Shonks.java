@@ -18,6 +18,23 @@ import shonks.ui.Ui;
  */
 public class Shonks {
 
+    private final Storage storage;
+    private final TaskList taskList;
+
+    public Shonks(String filePath) {
+        this.storage = new Storage(filePath);
+
+        TaskList loadedList;
+        try {
+            ArrayList<Task> loaded = storage.load();
+            loadedList = new TaskList(loaded);
+        } catch (ShonksException e) {
+            loadedList = new TaskList();
+        }
+        this.taskList = loadedList;
+    }
+
+
     /**
      * Returns the task at the given 1-based index, or throws a ShonksException if invalid.
      *
@@ -155,4 +172,91 @@ public class Shonks {
             }
         }
     }
+    public String getResponse(String input) {
+    try {
+        Command command = Parser.parse(input);
+
+        if (command.type == Command.Type.EXIT) {
+            return "bye. hope to see you again soon!";
+        }
+
+        if (command.type == Command.Type.LIST) {
+            if (taskList.size() == 0) {
+                return "your list is empty.";
+            }
+            StringBuilder sb = new StringBuilder("here are the tasks in your list:\n");
+            for (int i = 0; i < taskList.size(); i++) {
+                sb.append(taskList.get(i).formatForList(i + 1)).append("\n");
+            }
+            return sb.toString().trim();
+        }
+
+        if (command.type == Command.Type.MARK) {
+            Task task = getTaskOrThrow(taskList, command.index);
+            task.markDone();
+            storage.save(taskList.getInternalList());
+            return "nice! i've marked this task as done:\n  " + task;
+        }
+
+        if (command.type == Command.Type.UNMARK) {
+            Task task = getTaskOrThrow(taskList, command.index);
+            task.unmarkDone();
+            storage.save(taskList.getInternalList());
+            return "ok! i've marked this task as not done yet:\n  " + task;
+        }
+
+        if (command.type == Command.Type.DELETE) {
+            Task removed = removeTaskOrThrow(taskList, command.index);
+            storage.save(taskList.getInternalList());
+            return "noted. i've removed this task:\n  " + removed
+                    + "\nnow you have " + taskList.size() + " tasks in the list.";
+        }
+
+        if (command.type == Command.Type.TODO) {
+            Task task = new Todo(command.description);
+            taskList.add(task);
+            storage.save(taskList.getInternalList());
+            return "got it. i've added this task:\n  " + task
+                    + "\nnow you have " + taskList.size() + " tasks in the list.";
+        }
+
+        if (command.type == Command.Type.DEADLINE) {
+            Task task = new Deadline(command.description, command.by);
+            taskList.add(task);
+            storage.save(taskList.getInternalList());
+            return "got it. i've added this task:\n  " + task
+                    + "\nnow you have " + taskList.size() + " tasks in the list.";
+        }
+
+        if (command.type == Command.Type.EVENT) {
+            Task task = new Event(command.description, command.from, command.to);
+            taskList.add(task);
+            storage.save(taskList.getInternalList());
+            return "got it. i've added this task:\n  " + task
+                    + "\nnow you have " + taskList.size() + " tasks in the list.";
+        }
+
+        if (command.type == Command.Type.FIND) {
+            StringBuilder sb = new StringBuilder("matching tasks:\n");
+            int shown = 0;
+            for (int i = 0; i < taskList.size(); i++) {
+                Task task = taskList.get(i);
+                if (task.contains(command.keyword)) {
+                    shown++;
+                    sb.append(task.formatForList(shown)).append("\n");
+                }
+            }
+            if (shown == 0) {
+                return "no matching tasks found.";
+            }
+            return sb.toString().trim();
+        }
+
+        return "i don't understand that command.";
+
+    } catch (ShonksException e) {
+        return e.getMessage();
+    }
+}
+
 }
