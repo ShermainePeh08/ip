@@ -1,6 +1,8 @@
 package shonks;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import shonks.command.Command;
 import shonks.parser.Parser;
@@ -233,19 +235,19 @@ public class Shonks {
     }
 
     private String formatFindResponse(String keyword) {
-        StringBuilder sb = new StringBuilder("matching tasks:\n");
-        int shown = 0;
-        for (int i = 0; i < taskList.size(); i++) {
-            Task task = taskList.get(i);
-            if (task.contains(keyword)) {
-                shown++;
-                sb.append(task.formatForList(shown)).append("\n");
-            }
+        List<Task> matches = taskList.getInternalList().stream()
+            .filter(task -> task.contains(keyword))
+            .collect(Collectors.toList());
+
+        if (matches.isEmpty()) {
+            return "no matching tasks found.";
         }
 
-        if (shown == 0) {
-            return "no matching tasks found.";
+        StringBuilder sb = new StringBuilder("matching tasks:\n");
+        for (int i = 0; i < matches.size(); i++) {
+            sb.append(matches.get(i).formatForList(i + 1)).append("\n");
         }
         return sb.toString().trim();
     }
 }
+

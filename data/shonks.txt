@@ -5,4 +5,6 @@ T | 0 | read book
 D | 0 | submit cs2030s | 2026-02-10
 T | 0 | test gui
 T | 0 | level 10
-T | 1 | run away
+T | 1 | jump
+T | 0 | play
+E | 0 | huh | 2019-10-15T14:00 | 2019-10-20T15:00
