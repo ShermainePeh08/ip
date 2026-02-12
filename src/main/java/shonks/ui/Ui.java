@@ -19,10 +19,12 @@ public class Ui {
     }
 
     public String readCommand() {
+        assert scanner != null : "Scanner should be initialised";
         return scanner.nextLine().trim();
     }
 
     public void showError(String message) {
+        assert message != null : "Error message should not be null";
         System.out.println("Oops! " + message);
     }
 
@@ -31,27 +33,34 @@ public class Ui {
     }
 
     public void showLine(String line) {
+        assert line != null : "Line to print should not be null";
         System.out.println(line);
     }
 
     public void showAdded(Task task, int size) {
+        assert task != null : "Task should not be null";
+        assert size >= 0 : "Task list size should be non-negative";
         System.out.println("Got it. I've added this task:");
         System.out.println("  " + task.formatStatusLine());
         System.out.println("Now you have " + size + " tasks in the list.");
     }
 
     public void showDeleted(Task task, int size) {
+        assert task != null : "Task should not be null";
+        assert size >= 0 : "Task list size should be non-negative";
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + task.formatStatusLine());
         System.out.println("Now you have " + size + " tasks in the list.");
     }
 
     public void showMarked(Task task) {
+        assert task != null : "Task should not be null";
         System.out.println("Nice! I've marked this task as done:");
         System.out.println("  " + task.formatStatusLine());
     }
 
     public void showUnmarked(Task task) {
+        assert task != null : "Task should not be null";
         System.out.println("OK, I've marked this task as not done yet:");
         System.out.println("  " + task.formatStatusLine());
     }

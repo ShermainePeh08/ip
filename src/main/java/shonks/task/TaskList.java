@@ -9,6 +9,7 @@ public class TaskList {
     private final ArrayList<Task> tasks;
 
     public TaskList(ArrayList<Task> tasks) {
+        assert tasks != null : "Initial task list should not be null";
         this.tasks = tasks;
     }
 
@@ -21,18 +22,22 @@ public class TaskList {
     }
 
     public Task get(int index) {
+        assert index >= 0 && index < tasks.size() : "Index out of bounds";
         return tasks.get(index);
     }
 
     public void add(Task task) {
+        assert task != null : "Task to add should not be null";
         tasks.add(task);
     }
 
     public Task remove(int index) {
+        assert index >= 0 && index < tasks.size() : "Index out of bounds";
         return tasks.remove(index);
     }
 
     public ArrayList<Task> getInternalList() {
+        assert tasks != null : "Internal task list should not be null";
         return tasks;
     }
 }

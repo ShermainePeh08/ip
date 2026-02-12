@@ -17,10 +17,12 @@ public class Storage {
     private final String filePath;
 
     public Storage(String filePath) {
+        assert filePath != null && !filePath.isEmpty() : "File path should be non-empty";
         this.filePath = filePath;
     }
 
     public ArrayList<Task> load() throws ShonksException {
+        assert filePath != null && !filePath.isEmpty() : "File path should be non-empty";
         ArrayList<Task> tasks = new ArrayList<>();
 
         File file = new File(filePath);
@@ -44,6 +46,9 @@ public class Storage {
     }
 
     public void save(ArrayList<Task> tasks) throws ShonksException {
+        assert tasks != null : "Tasks to save should not be null";
+        assert filePath != null && !filePath.isEmpty() : "File path should be non-empty";
+
         File file = new File(filePath);
         File parent = file.getParentFile();
 
@@ -55,6 +60,7 @@ public class Storage {
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
             for (Task task : tasks) {
+                assert task != null : "Task in list should not be null";
                 bw.write(task.toStorageString());
                 bw.newLine();
             }

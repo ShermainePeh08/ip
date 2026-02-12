@@ -13,6 +13,7 @@ import shonks.command.Command;
 public class Parser {
 
     private static int parseTaskNumber(String raw) throws ShonksException {
+        assert raw != null : "Task number token should not be null";
         try {
             int num = Integer.parseInt(raw.trim());
             if (num <= 0) {
@@ -25,6 +26,7 @@ public class Parser {
     }
 
     public static Command parse(String input) throws ShonksException {
+        assert input != null : "User input should not be null";
         input = input.trim();
 
         if (input.equals("bye")) {
