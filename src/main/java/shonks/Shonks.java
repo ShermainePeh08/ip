@@ -14,11 +14,16 @@ import shonks.task.TaskList;
 import shonks.task.Todo;
 import shonks.ui.Ui;
 
-/**
- * Entry point of the Shonks chatbot application.
- * Reads user commands, updates the task list, and prints responses.
- */
 public class Shonks {
+    /**
+     * The main application class for Shonks.
+     * <p>
+     * This class coordinates user input parsing, command execution, task list
+     * management, and storage operations. It serves as the central controller
+     * for the application and integrates extension features such as task
+     * archiving and statistics reporting.
+     */
+    private static final String ARCHIVE_PATH = "./data/shonks-archive.txt";
 
     private final Storage storage;
     private final TaskList taskList;
@@ -154,6 +159,21 @@ public class Shonks {
                     continue;
                 }
 
+                if (command.type == Command.Type.STATS) {
+                    ui.showLine(formatStats(taskList));
+                    continue;
+                }
+
+                if (command.type == Command.Type.ARCHIVE) {
+                    int archivedCount = taskList.size();
+                    storage.archiveTo(ARCHIVE_PATH, taskList.getInternalList());
+                    taskList.clear();
+                    storage.save(taskList.getInternalList());
+                    ui.showLine("🗄 Archived " + archivedCount + " task(s) to " + ARCHIVE_PATH
+                            + ". Your list is now empty.");
+                    continue;
+                }
+
                 throw new ShonksException("I don't understand that command.");
 
             } catch (ShonksException e) {
@@ -190,9 +210,78 @@ public class Shonks {
             return addAndFormat(new Event(command.description, command.from, command.to));
         case FIND:
             return formatFindResponse(command.keyword);
+        case STATS:
+            return formatStats(taskList);
+        case ARCHIVE:
+            return archiveAndFormat(command.index);
         default:
             return "i don't understand that command.";
         }
+    }
+
+    /**
+     * Archives all tasks if {@code oneBasedIndex} is null, otherwise archives only the specified task.
+     *
+     * @param oneBasedIndex 1-based task number to archive, or null to archive all tasks.
+     * @return User-facing message describing the archive result.
+     * @throws ShonksException If an invalid index is given or I/O fails.
+     */
+    private String archiveAndFormat(Integer oneBasedIndex) throws ShonksException {
+        if (oneBasedIndex == null) {
+            int archivedCount = taskList.size();
+            storage.archiveTo(ARCHIVE_PATH, taskList.getInternalList());
+            taskList.clear();
+            storage.save(taskList.getInternalList());
+            return "🗄 archived " + archivedCount + " task(s) to " + ARCHIVE_PATH
+                    + ". your list is now empty.";
+        }
+
+        Task task = getTaskOrThrow(taskList, oneBasedIndex);
+
+        java.util.ArrayList<Task> one = new java.util.ArrayList<>();
+        one.add(task);
+
+        storage.archiveTo(ARCHIVE_PATH, one);
+        removeTaskOrThrow(taskList, oneBasedIndex);
+        storage.save(taskList.getInternalList());
+
+        return "🗄 archived task:\n  " + task + "\nnow you have " + taskList.size() + " tasks in the list.";
+    }
+
+    /**
+     * Computes and formats summary statistics about the current in-memory task list.
+     * This includes total tasks, completed vs pending counts, and a breakdown by task type.
+     *
+     * @param taskList The current task list.
+     * @return A user-facing multi-line string containing statistics.
+     */
+    private static String formatStats(TaskList taskList) {
+        int total = taskList.size();
+        int done = 0;
+        int todo = 0;
+        int deadline = 0;
+        int event = 0;
+
+        for (Task t : taskList.getInternalList()) {
+            if (t.isDone()) { 
+                done++;
+            }
+            if (t instanceof Todo) {
+                todo++;
+            } else if (t instanceof Deadline) {
+                deadline++;
+            } else if (t instanceof Event) {
+                event++;
+            }
+        }
+
+        int pending = total - done;
+
+        return "📊 stats\n"
+                + "total: " + total + "\n"
+                + "done: " + done + "\n"
+                + "pending: " + pending + "\n"
+                + "types: todo=" + todo + ", deadline=" + deadline + ", event=" + event;
     }
 
     private String formatListResponse() {
@@ -250,4 +339,3 @@ public class Shonks {
         return sb.toString().trim();
     }
 }
-

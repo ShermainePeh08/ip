@@ -10,10 +10,15 @@ import java.util.ArrayList;
 import shonks.ShonksException;
 import shonks.task.Task;
 
-/**
- * Handles loading tasks from disk and saving tasks back to disk.
- */
 public class Storage {
+    /**
+     * Handles loading, saving, and archiving of tasks in Shonks.
+     * <p>
+     * This class manages all file I/O operations, including persisting the current
+     * task list to disk and appending archived tasks to a separate archive file.
+     * Tasks are stored in a single-line text format defined by
+     * {@link shonks.task.Task#toStorageString()}.
+     */
     private final String filePath;
 
     public Storage(String filePath) {
@@ -27,7 +32,7 @@ public class Storage {
 
         File file = new File(filePath);
         if (!file.exists()) {
-            return tasks; // first run: no file yet
+            return tasks;
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -66,6 +71,41 @@ public class Storage {
             }
         } catch (IOException e) {
             throw new ShonksException("Error saving data.");
+        }
+    }
+
+    /**
+     * Appends the given tasks to an archive file.
+     * <p>
+     * This does not modify the in-memory task list. Callers should clear the current list
+     * separately if they want a "clean slate" effect after archiving.
+     * <p>
+     * Each archived task is written using {@link shonks.task.Task#toStorageString()}.
+     *
+     * @param archivePath Path to the archive file to append to.
+     * @param tasks Tasks to archive.
+     * @throws shonks.ShonksException If archiving fails due to I/O errors or invalid paths.
+     */
+    public void archiveTo(String archivePath, ArrayList<Task> tasks) throws ShonksException {
+        assert archivePath != null && !archivePath.isEmpty() : "Archive path should be non-empty";
+        assert tasks != null : "Tasks to archive should not be null";
+
+        File file = new File(archivePath);
+        File parent = file.getParentFile();
+
+        if (parent != null && !parent.exists()) {
+            if (!parent.mkdirs()) {
+                throw new ShonksException("Could not create archive folder.");
+            }
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) { // append = true
+            for (Task task : tasks) {
+                bw.write(task.toStorageString());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            throw new ShonksException("Error archiving data.");
         }
     }
 }

@@ -1,11 +1,15 @@
 package shonks.task;
 import java.util.ArrayList;
 
-/**
- * Wraps the task collection and provides operations to add, delete,
- * and access tasks in a single place.
- */
 public class TaskList {
+    /**
+     * Represents a mutable list of tasks managed by Shonks.
+     * <p>
+     * This class provides operations for adding, removing, retrieving, and
+     * clearing tasks. It is used as the in-memory representation of the user's
+     * task list and supports extension features such as task archiving and
+     * statistics generation.
+     */
     private final ArrayList<Task> tasks;
 
     public TaskList(ArrayList<Task> tasks) {
@@ -39,5 +43,13 @@ public class TaskList {
     public ArrayList<Task> getInternalList() {
         assert tasks != null : "Internal task list should not be null";
         return tasks;
+    }
+
+    /**
+     * Removes all tasks from this task list.
+     * After calling this, {@code size()} will return 0.
+     */
+    public void clear() {
+        tasks.clear();
     }
 }

@@ -4,14 +4,26 @@ import java.time.LocalDateTime;
 
 import shonks.ShonksException;
 
-/**
- * Represents a generic task with a description and completion status.
- * <p>
- * This class serves as the base class for all task types in Shonks.
- */
 public class Task {
+    /**
+     * Represents a generic task with a description and completion status.
+     * <p>
+     * This class serves as the base class for all task types in Shonks and provides
+     * common functionality such as marking tasks as done, checking completion
+     * status, and formatting tasks for display and storage.
+     */
+
     protected final String description;
     protected boolean isDone;
+
+    /**
+     * Returns whether this task is marked as done.
+     *
+     * @return {@code true} if the task is completed, {@code false} otherwise.
+     */
+    public boolean isDone() {
+        return isDone;
+    }
 
     public Task(String description) {
         this.description = description;
