@@ -5,3 +5,4 @@ T | 0 | read book
 D | 0 | submit cs2030s | 2026-02-10
 T | 0 | test gui
 T | 0 | level 10
+T | 1 | run away
