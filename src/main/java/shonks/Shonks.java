@@ -34,15 +34,10 @@ public class Shonks {
         this.taskList = loadedList;
     }
 
+    private void save() throws ShonksException {
+        storage.save(taskList.getInternalList());
+    }
 
-    /**
-     * Returns the task at the given 1-based index, or throws a ShonksException if invalid.
-     *
-     * @param taskList The task list.
-     * @param oneBasedIndex 1-based task number.
-     * @return The task at that index.
-     * @throws ShonksException If the index is out of range.
-     */
     private static Task getTaskOrThrow(TaskList taskList, int oneBasedIndex) throws ShonksException {
         int i = oneBasedIndex - 1;
         if (i < 0 || i >= taskList.size()) {
@@ -51,14 +46,6 @@ public class Shonks {
         return taskList.get(i);
     }
 
-    /**
-     * Removes the task at the given 1-based index, or throws a ShonksException if invalid.
-     *
-     * @param taskList The task list.
-     * @param oneBasedIndex 1-based task number.
-     * @return The removed task.
-     * @throws ShonksException If the index is out of range.
-     */
     private static Task removeTaskOrThrow(TaskList taskList, int oneBasedIndex) throws ShonksException {
         int i = oneBasedIndex - 1;
         if (i < 0 || i >= taskList.size()) {
@@ -147,7 +134,7 @@ public class Shonks {
                     continue;
                 }
 
-                                if (command.type == Command.Type.FIND) {
+                if (command.type == Command.Type.FIND) {
                     ui.showFindHeader();
 
                     int shown = 0;
@@ -172,91 +159,93 @@ public class Shonks {
             }
         }
     }
+
     public String getResponse(String input) {
-    try {
-        Command command = Parser.parse(input);
-
-        if (command.type == Command.Type.EXIT) {
-            return "bye. hope to see you again soon!";
+        try {
+            return respondTo(Parser.parse(input));
+        } catch (ShonksException e) {
+            return e.getMessage();
         }
-
-        if (command.type == Command.Type.LIST) {
-            if (taskList.size() == 0) {
-                return "your list is empty.";
-            }
-            StringBuilder sb = new StringBuilder("here are the tasks in your list:\n");
-            for (int i = 0; i < taskList.size(); i++) {
-                sb.append(taskList.get(i).formatForList(i + 1)).append("\n");
-            }
-            return sb.toString().trim();
-        }
-
-        if (command.type == Command.Type.MARK) {
-            Task task = getTaskOrThrow(taskList, command.index);
-            task.markDone();
-            storage.save(taskList.getInternalList());
-            return "nice! i've marked this task as done:\n  " + task;
-        }
-
-        if (command.type == Command.Type.UNMARK) {
-            Task task = getTaskOrThrow(taskList, command.index);
-            task.unmarkDone();
-            storage.save(taskList.getInternalList());
-            return "ok! i've marked this task as not done yet:\n  " + task;
-        }
-
-        if (command.type == Command.Type.DELETE) {
-            Task removed = removeTaskOrThrow(taskList, command.index);
-            storage.save(taskList.getInternalList());
-            return "noted. i've removed this task:\n  " + removed
-                    + "\nnow you have " + taskList.size() + " tasks in the list.";
-        }
-
-        if (command.type == Command.Type.TODO) {
-            Task task = new Todo(command.description);
-            taskList.add(task);
-            storage.save(taskList.getInternalList());
-            return "got it. i've added this task:\n  " + task
-                    + "\nnow you have " + taskList.size() + " tasks in the list.";
-        }
-
-        if (command.type == Command.Type.DEADLINE) {
-            Task task = new Deadline(command.description, command.by);
-            taskList.add(task);
-            storage.save(taskList.getInternalList());
-            return "got it. i've added this task:\n  " + task
-                    + "\nnow you have " + taskList.size() + " tasks in the list.";
-        }
-
-        if (command.type == Command.Type.EVENT) {
-            Task task = new Event(command.description, command.from, command.to);
-            taskList.add(task);
-            storage.save(taskList.getInternalList());
-            return "got it. i've added this task:\n  " + task
-                    + "\nnow you have " + taskList.size() + " tasks in the list.";
-        }
-
-        if (command.type == Command.Type.FIND) {
-            StringBuilder sb = new StringBuilder("matching tasks:\n");
-            int shown = 0;
-            for (int i = 0; i < taskList.size(); i++) {
-                Task task = taskList.get(i);
-                if (task.contains(command.keyword)) {
-                    shown++;
-                    sb.append(task.formatForList(shown)).append("\n");
-                }
-            }
-            if (shown == 0) {
-                return "no matching tasks found.";
-            }
-            return sb.toString().trim();
-        }
-
-        return "i don't understand that command.";
-
-    } catch (ShonksException e) {
-        return e.getMessage();
     }
-}
 
+    private String respondTo(Command command) throws ShonksException {
+        switch (command.type) {
+        case EXIT:
+            return "bye. hope to see you again soon!";
+        case LIST:
+            return formatListResponse();
+        case MARK:
+            return markAndFormat(command.index);
+        case UNMARK:
+            return unmarkAndFormat(command.index);
+        case DELETE:
+            return deleteAndFormat(command.index);
+        case TODO:
+            return addAndFormat(new Todo(command.description));
+        case DEADLINE:
+            return addAndFormat(new Deadline(command.description, command.by));
+        case EVENT:
+            return addAndFormat(new Event(command.description, command.from, command.to));
+        case FIND:
+            return formatFindResponse(command.keyword);
+        default:
+            return "i don't understand that command.";
+        }
+    }
+
+    private String formatListResponse() {
+        if (taskList.size() == 0) {
+            return "your list is empty.";
+        }
+        StringBuilder sb = new StringBuilder("here are the tasks in your list:\n");
+        for (int i = 0; i < taskList.size(); i++) {
+            sb.append(taskList.get(i).formatForList(i + 1)).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    private String markAndFormat(int oneBasedIndex) throws ShonksException {
+        Task task = getTaskOrThrow(taskList, oneBasedIndex);
+        task.markDone();
+        save();
+        return "nice! i've marked this task as done:\n  " + task;
+    }
+
+    private String unmarkAndFormat(int oneBasedIndex) throws ShonksException {
+        Task task = getTaskOrThrow(taskList, oneBasedIndex);
+        task.unmarkDone();
+        save();
+        return "ok! i've marked this task as not done yet:\n  " + task;
+    }
+
+    private String deleteAndFormat(int oneBasedIndex) throws ShonksException {
+        Task removed = removeTaskOrThrow(taskList, oneBasedIndex);
+        save();
+        return "noted. i've removed this task:\n  " + removed
+                + "\nnow you have " + taskList.size() + " tasks in the list.";
+    }
+
+    private String addAndFormat(Task task) throws ShonksException {
+        taskList.add(task);
+        save();
+        return "got it. i've added this task:\n  " + task
+                + "\nnow you have " + taskList.size() + " tasks in the list.";
+    }
+
+    private String formatFindResponse(String keyword) {
+        StringBuilder sb = new StringBuilder("matching tasks:\n");
+        int shown = 0;
+        for (int i = 0; i < taskList.size(); i++) {
+            Task task = taskList.get(i);
+            if (task.contains(keyword)) {
+                shown++;
+                sb.append(task.formatForList(shown)).append("\n");
+            }
+        }
+
+        if (shown == 0) {
+            return "no matching tasks found.";
+        }
+        return sb.toString().trim();
+    }
 }
