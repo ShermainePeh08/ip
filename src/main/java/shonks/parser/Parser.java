@@ -7,48 +7,72 @@ import java.time.format.DateTimeParseException;
 import shonks.ShonksException;
 import shonks.command.Command;
 
-/**
- * Parses raw user input into structured commands.
- */
 public class Parser {
-
+    /**
+     * Parses raw user input strings into {@link shonks.command.Command} objects.
+     * <p>
+     * The parser is responsible for validating command keywords and arguments,
+     * and for constructing the appropriate {@code Command} representation.
+     * It supports both built-in task commands and extension commands such as
+     * {@code archive} and {@code stats}.
+     */
     private static final String DATE_FORMAT_MSG =
             "Please use date format yyyy-MM-dd (e.g., 2019-10-15).";
     private static final String DATETIME_FORMAT_MSG =
             "Please use datetime format yyyy-MM-ddTHH:mm (e.g., 2019-10-15T14:00).";
 
-public static Command parse(String input) throws ShonksException {
-    assert input != null : "User input should not be null";
+    /**
+     * Parses a user input string into a {@link shonks.command.Command}.
+     * The first token is treated as the command keyword, and the remainder as arguments.
+     *
+     * Supported keywords include built-in task commands (e.g., todo/deadline/event)
+     * and extension commands such as {@code archive} and {@code stats}.
+     *
+     * @param input Raw user input.
+     * @return Parsed {@code Command}.
+     * @throws shonks.ShonksException If the command keyword is unknown or arguments are invalid.
+     */
+    public static Command parse(String input) throws ShonksException {
+        assert input != null : "User input should not be null";
 
-    String trimmed = requireNonBlank(input, "Please enter a command.");
-    String[] parts = splitOnce(trimmed);
+        String trimmed = requireNonBlank(input, "Please enter a command.");
+        String[] parts = splitOnce(trimmed);
 
-    String keyword = parts[0];
-    String args = parts[1];
+        String keyword = parts[0];
+        String args = parts[1];
 
-    switch (keyword) {
-    case "bye":
-        return Command.exit();
-    case "list":
-        return Command.list();
-    case "mark":
-        return parseMark(args);
-    case "unmark":
-        return parseUnmark(args);
-    case "delete":
-        return parseDelete(args);
-    case "todo":
-        return parseTodo(args);
-    case "deadline":
-        return parseDeadline(args);
-    case "event":
-        return parseEvent(args);
-    case "find":
-        return parseFind(args);
-    default:
-        throw new ShonksException("I don't understand that command.");
+        switch (keyword) {
+        case "bye":
+            return Command.exit();
+        case "list":
+            return Command.list();
+        case "mark":
+            return parseMark(args);
+        case "unmark":
+            return parseUnmark(args);
+        case "delete":
+            return parseDelete(args);
+        case "todo":
+            return parseTodo(args);
+        case "deadline":
+            return parseDeadline(args);
+        case "event":
+            return parseEvent(args);
+        case "find":
+            return parseFind(args);
+        case "archive":
+        if (args.isEmpty()) {
+            return Command.archive(null);
+        }
+        return Command.archive(parseTaskNumber(args, "Please specify which task to archive."));
+
+        case "stats":
+            return Command.stats();
+
+        default:
+            throw new ShonksException("I don't understand that command.");
+        }
     }
-}
 
     /* ---------- Command parsers ---------- */
 
@@ -108,9 +132,7 @@ public static Command parse(String input) throws ShonksException {
         return Command.find(keyword);
     }
 
-    /* ---------- Shared helpers ---------- 
-    this helps avoid the need to repeat code in each parser 
-    fixed SLAP */
+    /* ---------- Shared helpers ---------- */
 
     private static String[] splitOnce(String input) {
         String[] parts = input.split("\\s+", 2);

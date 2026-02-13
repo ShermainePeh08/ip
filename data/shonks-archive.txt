@@ -1,0 +1,17 @@
+T | 0 | borrow book
+T | 0 | read book
+E | 1 | meeting | 2025-10-01T14:00 | 2025-10-01T16:00
+T | 0 | read book
+D | 0 | submit cs2030s | 2026-02-10
+T | 0 | test gui
+T | 0 | level 10
+T | 1 | jump
+T | 0 | play
+E | 0 | huh | 2019-10-15T14:00 | 2019-10-20T15:00
+T | 0 | read book
+T | 0 | buy milk
+D | 0 | submit report | 2026-02-20
+E | 0 | project meeting | 2026-02-18T14:00 | 2026-02-18T16:00
+D | 0 | submit report | 2026-02-20
+T | 0 | buy milk
+E | 0 | project meeting | 2026-02-18T14:00 | 2026-02-18T16:00
