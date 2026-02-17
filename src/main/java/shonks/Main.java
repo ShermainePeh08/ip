@@ -1,45 +1,34 @@
 package shonks;
 
-import java.net.URL;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
  * The main JavaFX entry point for the Shonks application.
- * Sets up the main window layout and wires user input to the chatbot response flow.
  */
 public class Main extends Application {
 
     private ScrollPane scrollPane;
     private VBox dialogContainer;
-    private TextField userInput;
-    private Button sendButton;
 
     private final Shonks shonks = new Shonks();
 
-    /**
-     * Starts the JavaFX application.
-     *
-     * @param stage The primary stage provided by JavaFX.
-     */
     @Override
     public void start(Stage stage) {
         BorderPane root = createRootLayout();
-        Scene scene = createScene(root);
+
+        Scene scene = new Scene(root, 420, 640);
 
         stage.setScene(scene);
         stage.setTitle("Shonks");
@@ -48,123 +37,87 @@ public class Main extends Application {
         stage.show();
     }
 
-    /**
-     * Creates the root layout for the main window.
-     *
-     * @return The root {@code BorderPane}.
-     */
     private BorderPane createRootLayout() {
         BorderPane root = new BorderPane();
         root.setTop(createHeader());
-        root.setCenter(createChatArea());
-        root.setBottom(createInputBar());
-        root.getStyleClass().add("root");
+        root.setCenter(createChatAreaWithBackground());
+        root.setBottom(new InputBar(dialogContainer, shonks));
         return root;
     }
 
-    /**
-     * Creates the scene for the application window and attaches stylesheets when available.
-     *
-     * @param root The root node of the scene graph.
-     * @return The created {@code Scene}.
-     */
-    private Scene createScene(BorderPane root) {
-        Scene scene = new Scene(root, 420, 640);
-        addStylesheetIfPresent(scene, "/css/main.css");
-        return scene;
-    }
-
-    /**
-     * Adds a stylesheet to the scene if it exists on the classpath.
-     *
-     * @param scene The scene to add the stylesheet to.
-     * @param resourcePath The classpath resource path of the stylesheet.
-     */
-    private void addStylesheetIfPresent(Scene scene, String resourcePath) {
-        URL url = Main.class.getResource(resourcePath);
-        if (url != null) {
-            scene.getStylesheets().add(url.toExternalForm());
-        }
-    }
-
-    /**
-     * Creates the fixed header component.
-     *
-     * @return The header node.
-     */
     private Node createHeader() {
-        Text title = new Text("Shonks");
-        title.getStyleClass().add("header-title");
+        ImageView logo = new ImageView(MainWindowImages.LOGO);
+        logo.setFitWidth(22);
+        logo.setFitHeight(22);
+        logo.setPreserveRatio(true);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Text title = new Text("shonks");
+        title.setStyle(
+            "-fx-font-size: 16px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-fill: #0f172a;"
+        );
 
-        HBox header = new HBox(10, title, spacer);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setPadding(new Insets(12, 14, 12, 14));
-        header.getStyleClass().add("header");
+        HBox header = new HBox(8, logo, title);
+        header.setAlignment(Pos.CENTER);
+        header.setPadding(new Insets(10));
+        header.setStyle("-fx-background-color: white;");
+
         return header;
     }
 
-    /**
-     * Creates the chat area component containing the scrollable dialog container.
-     *
-     * @return The chat area node.
-     */
-    private Node createChatArea() {
+    private Node createChatAreaWithBackground() {
+
         dialogContainer = new VBox();
-        dialogContainer.setPadding(new Insets(12));
-        dialogContainer.setSpacing(10);
-        dialogContainer.getStyleClass().add("dialog-container");
+        dialogContainer.setPadding(new Insets(15));
+        dialogContainer.setSpacing(12);
+        dialogContainer.setStyle("-fx-background-color: transparent;");
 
         scrollPane = new ScrollPane(dialogContainer);
         scrollPane.setFitToWidth(true);
-        scrollPane.getStyleClass().add("chat-scroll");
+        scrollPane.setPannable(true);
+        scrollPane.setStyle(
+                "-fx-background-color: transparent;" +
+                "-fx-background-insets: 0;" +
+                "-fx-padding: 0;"
+        );
 
-        dialogContainer.heightProperty().addListener((obs, oldV, newV) -> scrollPane.setVvalue(1.0));
+        scrollPane.viewportBoundsProperty().addListener((obs, oldV, newV) -> {
+                Node viewport = scrollPane.lookup(".viewport");
+                if (viewport != null) {
+                viewport.setStyle("-fx-background-color: transparent;");
+                }
+        });
 
-        return scrollPane;
-    }
+        dialogContainer.heightProperty().addListener(
+                (obs, oldV, newV) -> scrollPane.setVvalue(1.0)
+        );
 
-    /**
-     * Creates the input bar component containing the user input field and send button.
-     *
-     * @return The input bar node.
-     */
-    private Node createInputBar() {
-        userInput = new TextField();
-        userInput.getStyleClass().add("input-field");
+        addInitialBotMessage();
 
-        sendButton = new Button("Send");
-        sendButton.getStyleClass().add("send-button");
+        StackPane wrapper = new StackPane(scrollPane);
+        wrapper.setStyle(
+                "-fx-background-image: url('/images/bg.jpg');" +
+                "-fx-background-size: cover;" +
+                "-fx-background-position: center center;" 
+        );
 
-        HBox.setHgrow(userInput, Priority.ALWAYS);
-
-        HBox inputBar = new HBox(10, userInput, sendButton);
-        inputBar.setAlignment(Pos.CENTER);
-        inputBar.setPadding(new Insets(10, 12, 12, 12));
-        inputBar.getStyleClass().add("input-bar");
-
-        sendButton.setOnAction(e -> handleUserInput());
-        userInput.setOnAction(e -> handleUserInput());
-
-        return inputBar;
-    }
-
-    /**
-     * Handles user input: displays the user message, obtains the chatbot response, and displays it.
-     */
-    private void handleUserInput() {
-        String input = userInput.getText();
-        if (input == null || input.isBlank()) {
-            return;
+        return wrapper;
         }
 
-        dialogContainer.getChildren().add(DialogBox.getUserDialog(input, MainWindowImages.USER));
+    private void addInitialBotMessage() {
+        String greeting =
+            "Hello! I'm Shonks 👋\nHow can I help you today?";
 
-        String response = shonks.getResponse(input);
-        dialogContainer.getChildren().add(DialogBox.getShonksDialog(response, MainWindowImages.SHONKS));
+        dialogContainer.getChildren().add(
+            DialogBox.getShonksDialog(
+                greeting,
+                MainWindowImages.SHONKS
+            )
+        );
+    }
 
-        userInput.clear();
+    public static void main(String[] args) {
+        launch(args);
     }
 }
