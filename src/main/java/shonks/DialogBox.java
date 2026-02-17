@@ -84,7 +84,7 @@ public class DialogBox extends HBox {
      * @param img The image representing Shonks.
      * @return A {@code DialogBox} aligned to the left containing Shonks' message.
      */
-    public static DialogBox getDukeDialog(String s, Image img) {
+    public static DialogBox getShonksDialog(String s, Image img) {
         DialogBox db = new DialogBox(s, img);
         db.flip();
         return db;
