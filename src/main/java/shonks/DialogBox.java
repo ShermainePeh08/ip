@@ -37,6 +37,7 @@ public class DialogBox extends HBox {
 
         displayPicture.setFitWidth(50);
         displayPicture.setFitHeight(50);
+        displayPicture.setPreserveRatio(true);
 
         this.setAlignment(Pos.TOP_RIGHT);
         this.setSpacing(10);
