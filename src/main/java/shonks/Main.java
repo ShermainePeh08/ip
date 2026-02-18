@@ -107,7 +107,7 @@ public class Main extends Application {
 
     private void addInitialBotMessage() {
         String greeting =
-            "Hello! I'm Shonks 👋\nHow can I help you today?";
+            "Ribbit! I am Grumpy Shonks \nHow can I not help you today?";
 
         dialogContainer.getChildren().add(
             DialogBox.getShonksDialog(
