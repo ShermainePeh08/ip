@@ -13,17 +13,27 @@ import shonks.task.Task;
  */
 public class ArchiveHandler implements CommandHandler {
 
-    private static final String ARCHIVE_PATH = "./data/shonks-archive.txt";
+
+    private static final String ARCHIVE_PATH = getAppPath("shonks-archive.txt");
+
+    private static String getAppPath(String filename) {
+        String home = System.getProperty("user.home");
+        return home + "/.shonks/" + filename;
+    }
 
     @Override
     public void handle(Command command, ShonksContext context) throws ShonksException {
+        if (context.tasks().size() == 0) {
+            context.ui().showLine("Archive what?! There is nothing to archive. Zero. None.");
+            return;
+        }
         if (command.index == null) {
             int archivedCount = context.tasks().size();
             context.storage().archiveTo(ARCHIVE_PATH, context.tasks().getInternalList());
             context.tasks().clear();
             HandlerUtil.save(context);
-            context.ui().showLine("🗄 Archived " + archivedCount + " task(s) to " + ARCHIVE_PATH
-                    + ". Your list is now empty.");
+            context.ui().showLine("🗄 Archived " + archivedCount + " task(s). Find them in the bin next time."
+                    + "Your list is now empty.");
             return;
         }
 

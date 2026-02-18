@@ -20,13 +20,19 @@ import shonks.ui.Ui;
  */
 public class Shonks {
 
-    private static final String DATA_FILE_PATH = "./data/shonks.txt";
+    private static final String DATA_FILE_PATH = getAppPath("shonks.txt");
 
     private final Ui ui;
     private final TaskList tasks;
     private final UiParser parser;
     private final Storage storage;
     private final CommandInvoker commandInvoker;
+
+    private static String getAppPath(String filename) {
+        String home = System.getProperty("user.home");
+        return home + "/.shonks/" + filename;
+    }
+
 
     /**
      * Constructs a Shonks application instance.

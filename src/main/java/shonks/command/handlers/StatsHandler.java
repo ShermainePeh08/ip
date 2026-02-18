@@ -11,6 +11,9 @@ public class StatsHandler implements CommandHandler {
 
     @Override
     public void handle(Command command, ShonksContext context) {
-        context.ui().showLine(StatsUtil.format(context.tasks()));
+        StatsUtil.Summary s = StatsUtil.compute(context.tasks());
+
+        context.ui().showLine(StatsUtil.format(s));
+        context.ui().showPieChart("Task Types", s.todo, s.deadline, s.event);
     }
 }
