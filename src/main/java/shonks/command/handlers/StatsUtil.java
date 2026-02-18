@@ -12,12 +12,33 @@ import shonks.task.Todo;
 public class StatsUtil {
 
     /**
-     * Formats summary statistics for the given task list.
+     * Simple immutable stats container.
+     */
+    public static class Summary {
+        public final int total;
+        public final int done;
+        public final int pending;
+        public final int todo;
+        public final int deadline;
+        public final int event;
+
+        public Summary(int total, int done, int pending, int todo, int deadline, int event) {
+            this.total = total;
+            this.done = done;
+            this.pending = pending;
+            this.todo = todo;
+            this.deadline = deadline;
+            this.event = event;
+        }
+    }
+
+    /**
+     * Computes summary statistics for the given task list.
      *
      * @param taskList The task list.
-     * @return A formatted statistics string.
+     * @return Summary stats.
      */
-    public static String format(TaskList taskList) {
+    public static Summary compute(TaskList taskList) {
         int total = taskList.size();
         int done = 0;
         int todo = 0;
@@ -38,11 +59,30 @@ public class StatsUtil {
         }
 
         int pending = total - done;
+        return new Summary(total, done, pending, todo, deadline, event);
+    }
 
+    /**
+     * Formats summary statistics for the given task list.
+     *
+     * @param taskList The task list.
+     * @return A formatted statistics string.
+     */
+    public static String format(TaskList taskList) {
+        return format(compute(taskList));
+    }
+
+    /**
+     * Formats summary statistics from a precomputed Summary.
+     *
+     * @param s Summary stats.
+     * @return formatted string.
+     */
+    public static String format(Summary s) {
         return "📊 stats\n"
-                + "total: " + total + "\n"
-                + "done: " + done + "\n"
-                + "pending: " + pending + "\n"
-                + "types: todo=" + todo + ", deadline=" + deadline + ", event=" + event;
+                + "total: " + s.total + "\n"
+                + "done: " + s.done + "\n"
+                + "pending: " + s.pending + "\n"
+                + "types: todo=" + s.todo + ", deadline=" + s.deadline + ", event=" + s.event;
     }
 }

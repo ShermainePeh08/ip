@@ -1,24 +1,36 @@
-Hello! I'm Shonks
-What can I do for you?
-Got it. I've added this task:
+Oh. You are back.
+What do you want this time?
+Fine. I added it.
   [T][ ] borrow book
-Now you have 1 tasks in the list.
-Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
+You now have 1 tasks. Manage them responsibly.
+Fine. I added it.
+  [D][ ] return book (by: Mar 15 2026)
+You now have 2 tasks. Manage them responsibly.
+Fine. I added it.
+  [E][ ] project meeting (from: Mar 12 2026 14:00 to: Mar 12 2026 16:00)
+You now have 3 tasks. Manage them responsibly.
+📊 stats
+total: 3
+done: 0
+pending: 3
+types: todo=1, deadline=1, event=1
+🗄 Archived task:
+  [D][ ] return book (by: Mar 15 2026)
 Now you have 2 tasks in the list.
-Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm to: 4pm)
-Now you have 3 tasks in the list.
-Here are the tasks in your list:
+Here is your list. Try not to panic.
 1.[T][ ] borrow book
-2.[D][ ] return book (by: Sunday)
-3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
-Nice! I've marked this task as done:
-[D][X] return book (by: Sunday)
-Here are the tasks in your list:
-1.[T][ ] borrow book
-2.[D][X] return book (by: Sunday)
-3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
-OK, I've marked this task as not done yet:
-[D][ ] return book (by: Sunday)
-Bye. Hope to see you again soon!
+2.[E][ ] project meeting (from: Mar 12 2026 14:00 to: Mar 12 2026 16:00)
+📊 stats
+total: 2
+done: 0
+pending: 2
+types: todo=1, deadline=0, event=1
+🗄 Archived 2 task(s) to ./data/shonks-archive.txt. Your list is now empty.
+Here is your list. Try not to panic.
+📊 stats
+total: 0
+done: 0
+pending: 0
+types: todo=0, deadline=0, event=0
+Finally. Goodbye.
+Do not break anything while I am gone.

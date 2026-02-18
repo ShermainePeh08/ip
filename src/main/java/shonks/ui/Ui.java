@@ -81,6 +81,9 @@ public class Ui {
         renderLine("No matches found. Perhaps spell properly next time.");
     }
 
+    public void showPieChart(String title, int todo, int deadline, int event) {
+    }
+
     /**
      * Renders a single line of UI output.
      * Subclasses may override this to redirect output (e.g., GUI buffers).

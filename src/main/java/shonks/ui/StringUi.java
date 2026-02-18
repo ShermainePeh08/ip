@@ -8,6 +8,11 @@ import shonks.command.ExitStatus;
  */
 public class StringUi extends Ui {
 
+    /**
+     * Special marker prefix that the JavaFX GUI will detect and convert to a real chart node.
+     */
+    public static final String PIE_MARKER_PREFIX = "[[PIE|";
+
     private final StringBuilder output;
     private final ExitStatus exitStatus;
 
@@ -26,6 +31,17 @@ public class StringUi extends Ui {
     public void showBye() {
         super.showBye();
         exitStatus.requestExit();
+    }
+
+    @Override
+    public void showPieChart(String title, int todo, int deadline, int event) {
+        // Format: [[PIE|<title>|<todo>|<deadline>|<event>]]
+        // Title is kept, but you can ignore it in GUI if you want.
+        renderLine(PIE_MARKER_PREFIX + safe(title) + "|" + todo + "|" + deadline + "|" + event + "]]");
+    }
+
+    private static String safe(String s) {
+        return (s == null) ? "" : s.replace("|", "/").replace("]]", ")");
     }
 
     @Override
