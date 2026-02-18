@@ -63,7 +63,7 @@ public class Shonks {
 
             return output.toString().trim();
         } catch (ShonksException e) {
-            return "Oops! " + e.getMessage();
+            return e.getMessage();
         }
     }
 

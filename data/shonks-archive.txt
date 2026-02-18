@@ -16,3 +16,9 @@ D | 0 | submit report | 2026-02-20
 T | 0 | buy milk
 E | 0 | project meeting | 2026-02-18T14:00 | 2026-02-18T16:00
 T | 0 | buy milk
+D | 0 | submit report | 2026-02-20
+E | 1 | project meeting | 2026-02-18T14:00 | 2026-02-18T16:00
+T | 0 | jump around
+T | 0 | feed a frog
+T | 0 | help
+T | 0 | drink water

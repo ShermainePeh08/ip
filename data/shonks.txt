@@ -1,5 +1,4 @@
-D | 0 | submit report | 2026-02-20
-E | 1 | project meeting | 2026-02-18T14:00 | 2026-02-18T16:00
-T | 0 | jump around
-T | 0 | feed a frog
-T | 0 | help
+T | 0 | drink water
+T | 0 | water plants
+E | 0 | Project meeting | 2026-03-12T14:00 | 2026-03-12T16:00
+E | 0 | Avoid responsibilities | 2026-03-20T09:00 | 2026-03-20T23:59
