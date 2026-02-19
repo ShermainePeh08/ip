@@ -1,5 +1,6 @@
 package shonks.command.handlers;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import shonks.ShonksException;
@@ -18,7 +19,7 @@ public class ArchiveHandler implements CommandHandler {
 
     private static String getAppPath(String filename) {
         String home = System.getProperty("user.home");
-        return home + "/.shonks/" + filename;
+        return home + File.separator + ".shonks" + File.separator + filename;
     }
 
     @Override
@@ -33,7 +34,7 @@ public class ArchiveHandler implements CommandHandler {
             context.tasks().clear();
             HandlerUtil.save(context);
             context.ui().showLine("🗄 Archived " + archivedCount + " task(s). Find them in the bin next time."
-                    + "Your list is now empty.");
+                    + " Your list is now empty.");
             return;
         }
 
@@ -48,4 +49,5 @@ public class ArchiveHandler implements CommandHandler {
         context.ui().showLine("🗄 Archived task:\n  " + task.formatStatusLine()
                 + "\nNow you have " + context.tasks().size() + " tasks in the list.");
     }
+    
 }

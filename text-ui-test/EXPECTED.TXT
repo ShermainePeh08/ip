@@ -19,14 +19,15 @@ types: todo=1, deadline=1, event=1
 Now you have 2 tasks in the list.
 Here is your list. Try not to panic.
 1.[T][ ] borrow book
+Here is your list. Try not to panic.
 2.[E][ ] project meeting (from: Mar 12 2026 14:00 to: Mar 12 2026 16:00)
 📊 stats
 total: 2
 done: 0
 pending: 2
 types: todo=1, deadline=0, event=1
-🗄 Archived 2 task(s) to ./data/shonks-archive.txt. Your list is now empty.
-Here is your list. Try not to panic.
+🗄 Archived 2 task(s). Find them in the bin next time. Your list is now empty.
+There is NOTHING in your list. Wow! How empty!
 📊 stats
 total: 0
 done: 0

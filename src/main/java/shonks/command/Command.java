@@ -13,7 +13,7 @@ public class Command {
      */
     public enum Type {
         EXIT, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, FIND,
-        ARCHIVE, STATS 
+        ARCHIVE, RESTORE_ARCHIVE, STATS
     }
 
     public final Type type;
@@ -58,6 +58,10 @@ public class Command {
      */
     public static Command archive(Integer index) {
         return new Command(Type.ARCHIVE, index, null, null, null, null, null);
+    }
+
+    public static Command restoreArchive(Integer index) {
+        return new Command(Type.RESTORE_ARCHIVE, index, null, null, null, null, null);
     }
 
     /**

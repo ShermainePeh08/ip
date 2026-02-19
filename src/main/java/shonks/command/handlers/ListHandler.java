@@ -11,8 +11,13 @@ public class ListHandler implements CommandHandler {
 
     @Override
     public void handle(Command command, ShonksContext context) {
-        context.ui().showListHeader();
+
+        if (context.tasks().size() == 0) {
+            context.ui().showEmptyList();
+            return;
+        }
         for (int i = 0; i < context.tasks().size(); i++) {
+            context.ui().showListHeader();
             context.ui().showLine(context.tasks().get(i).formatForList(i + 1));
         }
     }

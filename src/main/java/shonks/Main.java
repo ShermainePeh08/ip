@@ -29,8 +29,10 @@ public class Main extends Application {
         BorderPane root = createRootLayout();
 
         Scene scene = new Scene(root, 420, 640);
-
         stage.setScene(scene);
+
+        root.setBottom(new InputBar(dialogContainer, shonks, stage));
+
         stage.setTitle("Shonks");
         stage.setMinWidth(380);
         stage.setMinHeight(560);
@@ -41,7 +43,6 @@ public class Main extends Application {
         BorderPane root = new BorderPane();
         root.setTop(createHeader());
         root.setCenter(createChatAreaWithBackground());
-        root.setBottom(new InputBar(dialogContainer, shonks));
         return root;
     }
 
@@ -85,7 +86,7 @@ public class Main extends Application {
         scrollPane.viewportBoundsProperty().addListener((obs, oldV, newV) -> {
                 Node viewport = scrollPane.lookup(".viewport");
                 if (viewport != null) {
-                viewport.setStyle("-fx-background-color: transparent;");
+                    viewport.setStyle("-fx-background-color: transparent;");
                 }
         });
 
@@ -99,11 +100,11 @@ public class Main extends Application {
         wrapper.setStyle(
                 "-fx-background-image: url('/images/bg.jpg');" +
                 "-fx-background-size: cover;" +
-                "-fx-background-position: center center;" 
+                "-fx-background-position: center center;"
         );
 
         return wrapper;
-        }
+    }
 
     private void addInitialBotMessage() {
         String greeting =

@@ -108,4 +108,62 @@ public class Storage {
             throw new ShonksException("Error archiving data.");
         }
     }
+
+    public ArrayList<Task> loadFromPath(String path) throws ShonksException {
+        assert path != null && !path.isEmpty() : "Path should be non-empty";
+        return loadFromFile(new File(path), new ArrayList<>(), "Error loading data.");
+    }
+
+    public void overwriteTo(String path, ArrayList<Task> tasks) throws ShonksException {
+        assert path != null && !path.isEmpty() : "Path should be non-empty";
+        assert tasks != null : "Tasks to write should not be null";
+        writeToPath(path, tasks, false, "Could not create folder.", "Error writing data.");
+    }
+
+    private static ArrayList<Task> loadFromFile(File file,
+                                           ArrayList<Task> tasks,
+                                           String ioErrorMessage) throws ShonksException {
+        if (!file.exists()) {
+            return tasks;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+                tasks.add(Task.fromStorageString(line));
+            }
+        } catch (IOException e) {
+            throw new ShonksException(ioErrorMessage);
+        }
+
+        return tasks;
+    }
+
+    private static void writeToPath(String path,
+                                    ArrayList<Task> tasks,
+                                    boolean append,
+                                    String mkdirErrorMessage,
+                                    String ioErrorMessage) throws ShonksException {
+        File file = new File(path);
+        File parent = file.getParentFile();
+
+        if (parent != null && !parent.exists()) {
+            if (!parent.mkdirs()) {
+                throw new ShonksException(mkdirErrorMessage);
+            }
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, append))) {
+            for (Task task : tasks) {
+                assert task != null : "Task in list should not be null";
+                bw.write(task.toStorageString());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            throw new ShonksException(ioErrorMessage);
+        }
+    }
 }

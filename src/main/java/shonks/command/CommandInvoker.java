@@ -15,6 +15,7 @@ import shonks.command.handlers.MarkHandler;
 import shonks.command.handlers.StatsHandler;
 import shonks.command.handlers.TodoAddHandler;
 import shonks.command.handlers.UnmarkHandler;
+import shonks.command.handlers.RestoreArchiveHandler;
 
 /**
  * Invokes the appropriate handler for a given command.
@@ -58,5 +59,6 @@ public class CommandInvoker {
         handlers.put(Command.Type.FIND, new FindHandler());
         handlers.put(Command.Type.STATS, new StatsHandler());
         handlers.put(Command.Type.ARCHIVE, new ArchiveHandler());
+        handlers.put(Command.Type.RESTORE_ARCHIVE, new RestoreArchiveHandler());
     }
 }

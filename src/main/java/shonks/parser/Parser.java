@@ -69,6 +69,9 @@ public class Parser {
             return parseArchive(t.args);
         case "stats":
             return Command.stats();
+        case "restore":
+        case "unarchive":
+            return parseRestoreArchive(t.args);
         default:
             throw new ShonksException("?? I do not understand that command. Try again but like correctly.");
         }
@@ -162,6 +165,17 @@ public class Parser {
 
         return Command.archive(taskNum);
     }
+
+    private static Command parseRestoreArchive(String args) throws ShonksException {
+    if (args.isEmpty()) {
+        return Command.restoreArchive(null);
+    }
+
+    int archivedTaskNum = parseTaskNumber(args,
+            "Restore which archived task? Use a number. Or just 'restore' for all.");
+
+    return Command.restoreArchive(archivedTaskNum);
+}
 
     /**
      * Splits a string using a single marker.

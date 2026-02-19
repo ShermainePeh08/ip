@@ -90,4 +90,10 @@ public class ArchiveAndStatsTest {
         assertEquals(0, tasks.size());
         assertTrue(out.toString().contains("Your list is now empty"));
     }
+
+    private static String getAppPath(String filename) {
+    String home = System.getProperty("user.home");
+    return home + File.separator + ".shonks" + File.separator + filename;
+}
+
 }

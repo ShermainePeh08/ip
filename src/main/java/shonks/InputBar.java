@@ -1,5 +1,7 @@
 package shonks;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,6 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import shonks.ui.StringUi;
 
 /**
@@ -18,14 +22,10 @@ public class InputBar extends HBox {
 
     private final TextField userInput;
     private final Button sendButton;
+    private final Stage stage;
 
-    /**
-     * Constructs an input bar linked to the dialog container and Shonks backend.
-     *
-     * @param dialogContainer The container displaying chat messages.
-     * @param shonks The backend instance.
-     */
-    public InputBar(VBox dialogContainer, Shonks shonks) {
+    public InputBar(VBox dialogContainer, Shonks shonks, Stage stage) {
+        this.stage = stage;
 
         this.userInput = new TextField();
         this.sendButton = new Button("Send");
@@ -65,14 +65,23 @@ public class InputBar extends HBox {
             return;
         }
 
+        String trimmed = input.trim();
+
         dialogContainer.getChildren().add(
-            DialogBox.getUserDialog(input, MainWindowImages.USER)
+            DialogBox.getUserDialog(trimmed, MainWindowImages.USER)
         );
 
-        String response = shonks.getResponse(input);
+        String response = shonks.getResponse(trimmed);
         renderResponse(dialogContainer, response);
 
         userInput.clear();
+
+        // ✅ If user typed bye → wait before closing
+        if (trimmed.equalsIgnoreCase("bye")) {
+            PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+            delay.setOnFinished(event -> Platform.exit());
+            delay.play();
+        }
     }
 
     private void renderResponse(VBox dialogContainer, String response) {
@@ -85,7 +94,6 @@ public class InputBar extends HBox {
 
         for (String line : lines) {
             if (line.startsWith(StringUi.PIE_MARKER_PREFIX) && line.endsWith("]]")) {
-                // flush any accumulated text before showing chart
                 flushTextIfAny(dialogContainer, textPart);
 
                 PieChart chart = parsePieChart(line);
@@ -112,13 +120,10 @@ public class InputBar extends HBox {
         textPart.setLength(0);
     }
 
-    /**
-     * Marker format: [[PIE|<title>|<todo>|<deadline>|<event>]]
-     */
     private PieChart parsePieChart(String markerLine) {
         try {
-            String inner = markerLine.substring(0, markerLine.length() - 2); // remove trailing ]]
-            inner = inner.substring(StringUi.PIE_MARKER_PREFIX.length());     // remove prefix
+            String inner = markerLine.substring(0, markerLine.length() - 2);
+            inner = inner.substring(StringUi.PIE_MARKER_PREFIX.length());
 
             String[] parts = inner.split("\\|");
             if (parts.length != 4) {
@@ -139,12 +144,11 @@ public class InputBar extends HBox {
             chart.setTitle(title);
             chart.setLabelsVisible(true);
             chart.setLegendVisible(true);
-
-            // optional sizing so it fits nicely in your bubble
             chart.setPrefWidth(260);
             chart.setPrefHeight(220);
 
             return chart;
+
         } catch (Exception e) {
             return null;
         }

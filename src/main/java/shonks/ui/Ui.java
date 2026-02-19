@@ -36,6 +36,10 @@ public class Ui {
         renderLine("Here is your list. Try not to panic.");
     }
 
+    public void showEmptyList() {
+        renderLine("There is NOTHING in your list. Wow! How empty!");
+    }
+
     public void showLine(String line) {
         assert line != null : "Line to print should not be null";
         renderLine(line);
