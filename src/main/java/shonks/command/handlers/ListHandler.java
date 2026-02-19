@@ -16,8 +16,8 @@ public class ListHandler implements CommandHandler {
             context.ui().showEmptyList();
             return;
         }
+        context.ui().showListHeader();
         for (int i = 0; i < context.tasks().size(); i++) {
-            context.ui().showListHeader();
             context.ui().showLine(context.tasks().get(i).formatForList(i + 1));
         }
     }

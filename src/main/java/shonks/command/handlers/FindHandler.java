@@ -17,7 +17,10 @@ public class FindHandler implements CommandHandler {
         for (int i = 0; i < context.tasks().size(); i++) {
             Task task = context.tasks().get(i);
             if (task.contains(command.keyword)) {
-                context.ui().showFindHeader();
+                if (shown == 0) {
+                    context.ui().showFindHeader();
+                }
+
                 shown++;
                 context.ui().showLine(task.formatForList(shown));
             }
