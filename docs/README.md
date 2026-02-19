@@ -72,7 +72,7 @@ Example: `todo read book`
 
 Format: `deadline <description> /by <date/time>`
 
-Example: `deadline submit report /by 2026-02-20 1800`
+Example: `deadline submit report /by 2026-02-20`
 
 If the date format is invalid, Shonks will display an error message.
 
@@ -83,7 +83,7 @@ If the date format is invalid, Shonks will display an error message.
 Format: `event <description> /from <start date/time> /to <end date/time>`
 
 Example:  
-`event project meeting /from 2026-02-20 1400 /to 2026-02-20 1600`
+`event project meeting /from 2026-02-20T14:00 /to 2026-02-20T16:00`
 
 ---
 
