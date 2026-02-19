@@ -1,26 +1,138 @@
-# Duke project template
+# 🐸 Shonks
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+Shonks is a desktop task management application built using **Java 17** and **JavaFX**.  
+It provides a chat style interface for managing tasks efficiently, with support for visual statistics and task archiving.
 
-## Setting up in Intellij
+Shonks may be grumpy — but it keeps your tasks organised.
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+Hello from
+```
+  _____ _                 _
+ / ____| |               | |
+| (___ | |__   ___  _ __ | | _____
+ \___ \| '_ \ / _ \| '_ \| |/ / __|
+ ____) | | | | (_) | | | |   <\__ \
+|_____/|_| |_|\___/|_| |_|_|\_\___/
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Duke.java` file, right-click it, and choose `Run Duke.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+```
+---
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+## ✨ Features
+- Add **Todo**, **Deadline**, and **Event** tasks
+- List all tasks
+- Mark and unmark tasks
+- Delete tasks
+- Find tasks by keyword
+- View task statistics using an in chat **pie chart**
+- Archive tasks
+- Restore archived tasks
+- Exit with delayed close
+
+---
+
+## 🖥 Running the Application
+
+### Using Gradle Wrapper
+
+Open a terminal in the project root directory.
+
+On Windows:
+```cmd
+.\gradlew run
+```
+On macOS/Linux:
+```cmd
+./gradlew run
+```
+---
+## Running Tests
+
+Shonks comes with automated tests to ensure core functionality works as expected.
+
+To run all tests from the project root directory, execute:
+
+```
+gradlew test
+```
+
+This command will:
+
+- Compile the test classes
+- Run all unit tests under `src/test`
+- Execute text-based integration tests (if present)
+- Display test results in the terminal
+
+After the tests finish running, a detailed report can be found at:
+
+```
+build/reports/tests/test/index.html
+```
+
+Open this file in your browser to view the full test summary and detailed results.
+
+
+## Architecture Overview
+
+Shonks follows a modular architecture with clear separation of concerns:
+
+- `command` — Defines command types and handlers  
+- `parser` — Parses user input into command objects  
+- `task` — Task models (Todo, Deadline, Event)  
+- `storage` — Handles file persistence and archive management  
+- `ui` — JavaFX user interface components  
+- `Shonks` — Core application logic  
+- `Main` and `Launcher` — Application entry points  
+
+This separation improves maintainability and extensibility.
+
+---
+
+## Technical Stack
+
+- Java 17  
+- JavaFX  
+- Gradle  
+- JUnit 5  
+
+---
+
+## Project Structure
+
+```
+project-root/
+├── README.md
+├── build.gradle
+├── settings.gradle
+├── gradlew
+├── gradlew.bat
+├── gradle/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── data/
+│   │   │   └── shonks/
+│   │   │       ├── .github/
+│   │   │       ├── command/
+│   │   │       ├── parser/
+│   │   │       ├── storage/
+│   │   │       ├── task/
+│   │   │       ├── ui/
+│   │   │       ├── DialogBox.java
+│   │   │       ├── InputBar.java
+│   │   │       ├── Launcher.java
+│   │   │       ├── Main.java
+│   │   │       ├── MainWindowImages.java
+│   │   │       ├── Shonks.java
+│   │   │       └── ShonksException.java
+│   │   └── resources/
+│   ├── test/
+│   └── text-ui-test/
+├── AI.md
+```
+
+## Notes
+
+- Ensure the project is built using JDK 17.  
+- Do not modify the `src/main/java` directory structure.  
+- Archive data is stored in the user's home directory under a `.shonks` folder.
+
